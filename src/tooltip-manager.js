@@ -114,7 +114,9 @@ class TooltipManager {
   add (target, options) {
     if (target.jquery) {
       const disposable = new CompositeDisposable()
-      for (const element of target) { disposable.add(this.add(element, options)) }
+      for (let i = 0; i < target.length; i++) {
+        disposable.add(this.add(target[i], options))
+      }
       return disposable
     }
 
@@ -150,10 +152,12 @@ class TooltipManager {
       tooltip.hide()
     }
 
+    // note: adding a listener here adds a new listener for every tooltip element that's registered.  Adding unnecessary listeners is bad for performance.  It would be better to add/remove listeners when tooltips are actually created in the dom.
     window.addEventListener('resize', hideTooltip)
 
     const disposable = new Disposable(() => {
       window.removeEventListener('resize', hideTooltip)
+
       hideTooltip()
       tooltip.destroy()
 
